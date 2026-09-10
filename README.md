@@ -1,12 +1,25 @@
 # Reference-free Singing Voice Timbre Attribute Prediction via Perception Informed Network
 
-# SDVED-TDA: Singing Dry Voice Evaluation Database with Timbre Descriptor Annotations
+Research repository for our work on **reference-free singing voice timbre attribute prediction**, bringing together the **SDVED-TDA dataset annotations, inference code, and training code**.
+
+For more details of our work, please see :
+
+## Overview
+
+Our framework predicts interpretable timbre attributes from a singing recording without requiring a reference performance. It combines a **256-dimensional frozen FACodec timbre embedding** with **44-dimensional handcrafted perceptual features**, followed by descriptor-specific MLP prediction heads.
+
+Transfer learning from instrument and speech timbre datasets supports adaptation to singing with limited annotated data. The prediction experiments focus on five attributes: **Bright, Thick, Soft, Pure, and Magnetic**.
+
+The handcrafted features comprise spectral centroid, spectral flux, harmonic-to-noise ratio (HNR), formant frequencies F1/F2, and 39-dimensional MFCC features. During transfer, the first two MLP layers are frozen while the remaining layers are fine-tuned on singing data.
+
+## SDVED-TDA : Singing Dry Voice Evaluation Database with Timbre Descriptor Annotations
 
 **SDVED-TDA** adds sample-level perceptual timbre annotations to the **Singing Dry Voice Evaluation Database (SDVED)**, part of the CCMusic database. While the original SDVED provides overall timbre scores, SDVED-TDA describes each singing sample using 18 timbre attributes.
 
 This repository provides the **annotation labels** and an inter-rater reliability figure. Audio recordings, model code, and pretrained weights are not included in this release.
 
-## Dataset overview
+
+### Dataset overview
 
 | Property | Description |
 | --- | --- |
@@ -96,3 +109,86 @@ The first record is shown below:
   "rich": 4.4166666667,
   "rough": 7.4166666667,
   "round": 3.1333333333,
+}
+```
+
+`audioFile` identifies the corresponding recording using this relative path convention:
+
+```text
+audio/<singer_id>/<singer_id>_<song_title>.wav
+```
+
+For example, `DH` is the singer identifier in the record above. The path is a reference to the recording, not a download URL. The repository does not contain an `audio/` directory; obtain the original SDVED audio separately from its provider and match the recordings to these identifiers. Preserve the Chinese characters in filenames when matching files.
+## Loading the labels
+
+Download or clone this repository, then run the following Python code from its root directory. Only the Python standard library is required.
+
+```python
+import json
+from pathlib import PurePosixPath
+
+with open("SDVED_TDA.json", "r", encoding="utf-8") as f:
+    records = json.load(f)
+
+# Use an explicit order when constructing label vectors.
+descriptors = [
+    "bright", "crisp", "dark", "harmonize", "hoarse", "low",
+    "magnetic", "muddy", "pure", "rich", "rough", "round",
+    "sharp", "shriveled", "slim", "soft", "thick", "thin",
+]
+
+audio_paths = [record["audioFile"] for record in records]
+singer_ids = [PurePosixPath(path).parent.name for path in audio_paths]
+labels = [[record[key] for key in descriptors] for record in records]
+
+print(f"Samples: {len(records)}")            # 132
+print(f"Singers: {len(set(singer_ids))}")    # 22
+print(f"Descriptors: {len(descriptors)}")   # 18
+
+# Optional: select the five dimensions used in the paper.
+paper_descriptors = ["bright", "thick", "soft", "pure", "magnetic"]
+paper_labels = [
+    [record[key] for key in paper_descriptors]
+    for record in records
+]
+```
+## Evaluation notes
+
+- These labels describe perceived timbre attributes, rather than a single overall singing quality score.
+- The manuscript uses an 80%/20% train/test partition at the singer level. Keep samples from the same singer together when constructing evaluation splits to avoid singer overlap.
+- This release does not include predefined split assignments or a split seed. A newly generated split should not be assumed to reproduce the paper's exact partition.
+- The dataset is limited to 132 samples from 22 singers; consider this scope when interpreting generalization results.
+
+## Training and reproduction
+
+The planned training release will cover the complete workflow:
+
+1. **Prepare data:** load CTIS and VCTK-RVA source-domain annotations and SDVED-TDA target-domain labels; resolve audio paths and apply the experiment splits.
+2. **Prepare source labels:** convert VCTK-RVA pairwise comparisons using the regularized Bradley–Terry procedure and document descriptor mappings across datasets.
+3. **Extract features:** compute frozen FACodec timbre embeddings and the 44-dimensional handcrafted feature vectors.
+4. **Train source models:** optimize descriptor-specific prediction heads using the source-domain data.
+5. **Fine-tune on singing:** freeze the first two MLP layers and adapt the remaining layers using descriptor-specific learning rates.
+6. **Evaluate:** report descriptor-wise errors and the aggregate MAE statistics used in the manuscript.
+
+Configuration files will specify preprocessing, model architecture, feature statistics, optimizer and scheduler settings, descriptor mappings, model groups, random seeds, and data splits. Exact split manifests are needed to reproduce the reported partition; a random seed alone does not describe that partition independently of the split implementation and sample order.
+
+
+## Citation
+If you use our SDVED-TDA dataset or other referring codes, please cite the following paper:
+```latex
+@article{yuan2026reference,
+  title={Reference-free Singing Voice Timbre Attribute Prediction via Perception Informed Network},
+  author={Hsi-Min Yuan, Pei-Chin Hsieh, Yih-Liang Shen, Tai-Shih Chi},
+  booktitle={2026 Asia Pacific Signal and Information Processing Association Annual Summit and Conference (APSIPA ASC)},
+  pages={1--6},
+  year={2026},
+  organization={IEEE}
+}
+
+```
+## Contact
+For questions about the dataset or implementation, please open an issue in this repository or contact :
+
+**Hsi-Min Yuan** at **simon4ni.ee13@nycu.edu.tw**.
+
+**Perceptual Signal Process Lab @ National Yang Ming Chiao Tung Univeristy** at **percept711@gmail.com**.
