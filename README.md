@@ -1,3 +1,5 @@
+# Reference-free Singing Voice Timbre Attribute Prediction via Perception Informed Network
+
 # SDVED-TDA: Singing Dry Voice Evaluation Database with Timbre Descriptor Annotations
 
 **SDVED-TDA** adds sample-level perceptual timbre annotations to the **Singing Dry Voice Evaluation Database (SDVED)**, part of the CCMusic database. While the original SDVED provides overall timbre scores, SDVED-TDA describes each singing sample using 18 timbre attributes.
