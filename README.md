@@ -176,7 +176,7 @@ Configuration files will specify preprocessing, model architecture, feature stat
 ## Citation
 If you use our SDVED-TDA dataset or other referring codes, please cite the following paper:
 ```latex
-@article{yuan2026reference,
+@inproceedings{yuan2026reference,
   title={Reference-free Singing Voice Timbre Attribute Prediction via Perception Informed Network},
   author={Hsi-Min Yuan, Pei-Chin Hsieh, Yih-Liang Shen, Tai-Shih Chi},
   booktitle={2026 Asia Pacific Signal and Information Processing Association Annual Summit and Conference (APSIPA ASC)},
