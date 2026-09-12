@@ -1,0 +1,19 @@
+# Install torch and torchaudio with the build appropriate for your CPU/CUDA first.
+torch
+torchaudio
+
+choix
+huggingface-hub
+numpy
+openpyxl
+pandas
+praat-parselmouth
+soundfile
+soxr
+tqdm
+
+# Required by the imported Amphion FACodec implementation.
+einops
+librosa
+pyworld
+
