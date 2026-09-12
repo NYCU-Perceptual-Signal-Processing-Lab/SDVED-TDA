@@ -4,6 +4,15 @@ Research repository for our work on **reference-free singing voice timbre attrib
 
 For more details of our work, please see :
 
+## Available resources
+
+- [SDVED-TDA labels](SDVED_TDA.json): 132 samples with 18 timbre descriptors.
+- [Code and usage guide](Codes/README.md): installation, feature extraction, label preparation, and training commands.
+
+The current release includes training and validation workflows. A standalone inference script, trained timbre prediction checkpoints, and exact paper split manifests are not included. FACodec backbone weights are downloaded separately by the training scripts.
+
+A public paper link will be added when available.
+
 ## Overview
 
 Our framework predicts interpretable timbre attributes from a singing recording without requiring a reference performance. It combines a **256-dimensional frozen FACodec timbre embedding** with **44-dimensional handcrafted perceptual features**, followed by descriptor-specific MLP prediction heads.
@@ -11,6 +20,26 @@ Our framework predicts interpretable timbre attributes from a singing recording 
 Transfer learning from instrument and speech timbre datasets supports adaptation to singing with limited annotated data. The prediction experiments focus on five attributes: **Bright, Thick, Soft, Pure, and Magnetic**.
 
 The handcrafted features comprise spectral centroid, spectral flux, harmonic-to-noise ratio (HNR), formant frequencies F1/F2, and 39-dimensional MFCC features. During transfer, the first two MLP layers are frozen while the remaining layers are fine-tuned on singing data.
+
+## Repository contents
+
+```text
+repository/
+├── README.md
+├── SDVED_TDA.json
+├── ICC_pic.png
+└── Codes/
+    ├── README.md                  # Code usage guide
+    ├── requirements.txt
+    ├── BradleyTerry.py            # Pairwise comparison score conversion
+    ├── audio_feature_utils.py     # Audio and feature utilities
+    ├── feature_schema.py          # Ordered 44-dimensional feature schema
+    ├── feature_extract_filewise.py
+    ├── train_source.py
+    └── train_target.py
+```
+
+The labels are available in [SDVED_TDA.json](SDVED_TDA.json).
 
 ## SDVED-TDA : Singing Dry Voice Evaluation Database with Timbre Descriptor Annotations
 
@@ -33,17 +62,6 @@ This repository provides the **annotation labels** and an inter-rater reliabilit
 | File format | UTF-8 JSON |
 
 Each sample has its own timbre attribute vector. Labels are not shared across all recordings from the same singer, allowing the annotations to preserve performance-dependent timbre variation.
-
-## Repository contents
-
-```text
-SDVED-TDA/
-├── README.md
-├── SDVED_TDA.json    # Sample-level timbre attribute labels
-└── ICC_pic.png       # Inter-rater reliability figure
-```
-
-The labels are available in [SDVED_TDA.json](SDVED_TDA.json).
 
 ## Annotation procedure
 
@@ -156,21 +174,28 @@ paper_labels = [
 
 - These labels describe perceived timbre attributes, rather than a single overall singing quality score.
 - The manuscript uses an 80%/20% train/test partition at the singer level. Keep samples from the same singer together when constructing evaluation splits to avoid singer overlap.
-- This release does not include predefined split assignments or a split seed. A newly generated split should not be assumed to reproduce the paper's exact partition.
+- In our work, we use `LYR`,`LZQ` as female test singer and `TGL` as male test singer. All results are measured on these data.
 - The dataset is limited to 132 samples from 22 singers; consider this scope when interpreting generalization results.
 
-## Training and reproduction
+## Training and evaluation
 
-The planned training release will cover the complete workflow:
+The released workflow consists of:
 
-1. **Prepare data:** load CTIS and VCTK-RVA source-domain annotations and SDVED-TDA target-domain labels; resolve audio paths and apply the experiment splits.
-2. **Prepare source labels:** convert VCTK-RVA pairwise comparisons using the regularized Bradley–Terry procedure and document descriptor mappings across datasets.
-3. **Extract features:** compute frozen FACodec timbre embeddings and the 44-dimensional handcrafted feature vectors.
-4. **Train source models:** optimize descriptor-specific prediction heads using the source-domain data.
-5. **Fine-tune on singing:** freeze the first two MLP layers and adapt the remaining layers using descriptor-specific learning rates.
-6. **Evaluate:** report descriptor-wise errors and the aggregate MAE statistics used in the manuscript.
+1. Obtain the original audio and extract the 44-dimensional acoustic features.
+2. Merge the features with one descriptor's labels and singer identifiers.
+3. Train a source-domain regression model using `Codes/train_source.py`.
+4. Fine-tune on singing data using `Codes/train_target.py` and a source checkpoint.
+5. Inspect the validation loss and the target script's final validation MAE.
 
-Configuration files will specify preprocessing, model architecture, feature statistics, optimizer and scheduler settings, descriptor mappings, model groups, random seeds, and data splits. Exact split manifests are needed to reproduce the reported partition; a random seed alone does not describe that partition independently of the split implementation and sample order.
+See **[Codes/README.md](Codes/README.md)** for the actual command-line interface, CSV schema, checkpoint outputs, and implementation notes. Each run predicts one scalar descriptor; prepare separate runs and output directories for different descriptors and model groups.
+
+### Reproduction scope
+
+The manuscript uses official source-domain splits and a singer-disjoint target train/test partition. The current source script instead creates a sample-level train/validation split, and the target script creates a singer-level train/validation split. Target MAE is computed over two-second validation segments using the same validation set used for checkpoint selection; it is not an independent test-set result.
+
+The public defaults also differ from the manuscript in some optimization settings. Exact paper reproduction requires the corresponding experiment settings, split manifests, and evaluation protocol. See the code guide for details.
+
+The annotations describe perceived timbre attributes rather than overall singing quality. The dataset contains 132 samples from 22 singers, which limits the scope of generalization claims.
 
 
 ## Citation
