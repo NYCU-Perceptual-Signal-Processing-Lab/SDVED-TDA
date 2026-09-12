@@ -151,6 +151,7 @@ Use `python <script>.py --help` to see every available option.
 Learning rate, epoch count, and batch size are currently configured in each script's `Config` class; they are not command-line flags. The split seed does not seed every source of training randomness.
 
 `--freeze-level 0` trains all head parameters; level 1 freezes the embedding normalization and manual-feature branch; level 2 additionally freezes the first fusion block. FACodec remains frozen at all levels.
+in our work, we used level 2 and modify the `frozen_indices` (434 line) to control the freeze layers & the coefficient at #376 line to control the learning rate.
 
 The manuscript reports a source learning rate of `1e-4` and equal MAE/MSE weighting. The public defaults above differ, and the source split is not the official dataset split described in the paper. Do not interpret default runs as exact reproductions of the paper's tables.
 
