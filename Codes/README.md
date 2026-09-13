@@ -23,10 +23,6 @@ The two experimental features `cpp_praat` and `inharmonicity_mean` are not
 part of this release. Both training scripts select the schema above by column
 name and reject CSV files that are missing any of the 44 columns.
 
-## Scope
-
-This guide documents the currently uploaded scripts. There is no standalone inference script or released timbre prediction checkpoint. Commands below are based on source inspection; a complete training run has not been verified as part of this documentation update.
-
 ## Installation
 
 Run the commands below from `Codes/` (`cd Codes` from the repository root).
@@ -140,7 +136,7 @@ Use `python <script>.py --help` to see every available option.
 
 | Setting | Source script | Target script |
 | --- | --- | --- |
-| Split | Sample-level 80/20, split seed 42 | Singer-level, `--val-ratio` default 0.2, split seed 42 |
+| Split | Sample-level 80/20, split seed 42 | Singer-level, `--val-ratio` default roughly 0.2 (Singer level split won't exactly be 20%, will be between 10~20 %), split we used is mentioned |
 | Learning rate | `1e-3` | `1e-4` |
 | Maximum epochs | 50 | 30 |
 | Batch size | 128 | 128 |
