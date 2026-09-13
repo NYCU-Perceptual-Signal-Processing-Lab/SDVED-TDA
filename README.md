@@ -2,14 +2,14 @@
 
 Research repository for our work on **reference-free singing voice timbre attribute prediction**, bringing together the **SDVED-TDA dataset annotations, inference code, and training code**.
 
-For more details of our work, please see :
+For more details of our work, please see : (provided when available !)
 
 ## Available resources
 
 - [SDVED-TDA labels](SDVED_TDA.json): 132 samples with 18 timbre descriptors.
 - [Code and usage guide](Codes/README.md): installation, feature extraction, label preparation, and training commands.
 
-The current release includes training and validation workflows. A standalone inference script, trained timbre prediction checkpoints, and exact paper split manifests are not included. FACodec backbone weights are downloaded separately by the training scripts.
+The current release includes source domain & target domain training and validation workflows.
 
 A public paper link will be added when available.
 
@@ -114,19 +114,25 @@ The first record is shown below:
 
 ```json
 {
-  "audioFile": "audio/DH/DH_但愿人长久.wav",
-  "bright": 4.1333333333,
-  "crisp": 2.5384615385,
-  "dark": 4.0666666667,
-  "harmonize": 1.4285714286,
-  "hoarse": 6.4666666667,
-  "low": 4.8666666667,
-  "magnetic": 2.8666666667,
-  "muddy": 7.2666666667,
-  "pure": 2.6666666667,
-  "rich": 4.4166666667,
-  "rough": 7.4166666667,
-  "round": 3.1333333333,
+"audioFile":"audio\/DH\/DH_但愿人长久.wav",
+    "bright":4.1333333333,
+    "crisp":2.5384615385,
+    "dark":4.0666666667,
+    "harmonize":1.4285714286,
+    "hoarse":6.4666666667,
+    "low":4.8666666667,
+    "magnetic":2.8666666667,
+    "muddy":7.2666666667,
+    "pure":2.6666666667,
+    "rich":4.4166666667,
+    "rough":7.4166666667,
+    "round":3.1333333333,
+    "sharp":4.4,
+    "shriveled":6.2666666667,
+    "slim":2.8,
+    "soft":2.4285714286,
+    "thick":4.0714285714,
+    "thin":5.4
 }
 ```
 
@@ -173,8 +179,8 @@ paper_labels = [
 ## Evaluation notes
 
 - These labels describe perceived timbre attributes, rather than a single overall singing quality score.
-- The manuscript uses an 80%/20% train/test partition at the singer level. Keep samples from the same singer together when constructing evaluation splits to avoid singer overlap.
-- In our work, we use `LYR`,`LZQ` as female test singer and `TGL` as male test singer. All results are measured on these data.
+- The manuscript uses train/test partition at the singer level. Keep samples from the same singer together when constructing evaluation splits to avoid singer overlap.
+- In our work, we use `LYR`,`LZQ` as female test singer (2/13) and `TGL` as male test singer (1/9). All reported SDVED-TDA test results are measured on these data.
 - The dataset is limited to 132 samples from 22 singers; consider this scope when interpreting generalization results.
 
 ## Training and evaluation
@@ -227,4 +233,4 @@ For questions about the dataset or implementation, please open an issue in this 
 
 **Hsi-Min Yuan** at **simon4ni.ee13@nycu.edu.tw**.
 
-**Perceptual Signal Process Lab @ National Yang Ming Chiao Tung Univeristy** at **percept711@gmail.com**.
+**Perceptual Signal Process Lab @ National Yang Ming Chiao Tung University** at **percept711@gmail.com**.
